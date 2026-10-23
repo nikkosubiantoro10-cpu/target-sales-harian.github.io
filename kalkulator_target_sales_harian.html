@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kalkulator Target Sales Harian</title>
+<style>
+:root {
+  --site-primary: #176b52;
+  --site-on-primary: #ffffff;
+  --site-secondary: #e5f2ec;
+  --site-on-secondary: #183b30;
+  --site-background: #f4f7f5;
+  --site-on-background: #1b2923;
+  --site-font-body: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --site-font-heading: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --site-heading-scale: 1;
+  --site-spacing-scale: 1;
+  --site-radius-scale: 1;
+  --site-decoration-opacity: 1;
+}
+* { box-sizing: border-box; }
+body { margin: 0; font-family: var(--site-font-body); background: var(--site-background); color: var(--site-on-background); }
+.app { min-height: 100vh; width: 100%; background-color: light-dark(var(--site-background), #111714); color: light-dark(var(--site-on-background), #e9f2ed); padding: calc(28px * var(--site-spacing-scale)) 16px 40px; }
+.container { max-width: 1050px; margin: 0 auto; }
+header { background: var(--site-primary); color: var(--site-on-primary); border-radius: calc(22px * var(--site-radius-scale)); padding: calc(28px * var(--site-spacing-scale)); position: relative; overflow: hidden; }
+header:after { content:""; position:absolute; width:230px;height:230px;border-radius:50%;right:-50px;top:-90px;background:#ffffff;opacity:calc(.08 * var(--site-decoration-opacity));pointer-events:none; }
+.eyebrow { font-size: .78rem; text-transform: uppercase; letter-spacing: .14em; font-weight: 800; opacity: .8; }
+h1 { font-family: var(--site-font-heading); font-size: calc(2rem * var(--site-heading-scale)); line-height:1.1; margin: 10px 0; }
+header p { margin:0; max-width: 620px; line-height:1.55; opacity:.9; }
+.layout { display:grid; grid-template-columns: 1.05fr .95fr; gap:18px; margin-top:18px; align-items:start; }
+.card { background: light-dark(#ffffff, #1b2420); border:1px solid light-dark(#dfe8e2, #34423a); border-radius:calc(18px * var(--site-radius-scale)); padding:calc(22px * var(--site-spacing-scale)); box-shadow:0 6px 24px #173b2b0a; }
+h2 { font-size:calc(1.15rem * var(--site-heading-scale)); margin:0 0 18px; }
+label { display:block; font-size:.88rem; font-weight:700; margin-bottom:7px; }
+.field { margin-bottom:15px; }
+input, select { width:100%; border:1px solid light-dark(#cfdcd3,#46574c); border-radius:10px; padding:12px 13px; font:inherit; color:inherit; background:light-dark(#fff,#111714); outline:none; }
+input:focus, select:focus { border-color:var(--site-primary); box-shadow:0 0 0 3px #176b5220; }
+.two { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.hint { color:light-dark(#64736a,#a9b8af); font-size:.78rem; margin-top:5px; line-height:1.4; }
+.btnrow { display:flex; gap:10px; flex-wrap:wrap; margin-top:8px; }
+button { border:0; border-radius:10px; padding:12px 16px; font:inherit; font-weight:750; cursor:pointer; transition:transform .12s, opacity .12s; }
+button:active { transform:scale(.98); }
+.primary { background:var(--site-primary); color:var(--site-on-primary); }
+.secondary { background:var(--site-secondary); color:var(--site-on-secondary); }
+.full { width:100%; }
+.big { background:var(--site-secondary); color:var(--site-on-secondary); border-radius:14px; padding:18px; margin-bottom:12px; }
+.big .label { font-size:.85rem; opacity:.8; }
+.big .value { font-size:clamp(1.7rem,4vw,2.35rem); font-weight:850; letter-spacing:-.04em; margin-top:5px; overflow-wrap:anywhere; }
+.metrics { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.metric { border:1px solid light-dark(#e0e9e3,#34423a); padding:15px; border-radius:13px; min-width:0; }
+.metric .label { font-size:.78rem; color:light-dark(#627168,#aab8af); }
+.metric .value { font-size:1.12rem; font-weight:800; margin-top:6px; overflow-wrap:anywhere; }
+.progress-wrap { margin-top:20px; }
+.progress-head { display:flex;justify-content:space-between;gap:10px;font-size:.86rem;font-weight:750;margin-bottom:9px; }
+.track { height:12px; background:light-dark(#e5ece7,#34423a); border-radius:999px; overflow:hidden; }
+.bar { width:0%;height:100%;background:var(--site-primary);border-radius:999px;transition:width .25s; }
+.status { margin-top:12px; border-radius:10px; padding:12px; font-size:.87rem; line-height:1.45; background:light-dark(#f1f5f2,#25332b); }
+.status.good { background:#e3f5e9;color:#17623a; }
+.status.warn { background:#fff2d9;color:#80520c; }
+.status.bad { background:#fde8e7;color:#8c2822; }
+.tablewrap { overflow-x:auto; margin-top:18px; }
+table { width:100%; border-collapse:collapse; font-size:.88rem; min-width:500px; }
+th,td { text-align:left; padding:12px 10px; border-bottom:1px solid light-dark(#e4ebe6,#34423a); }
+th { font-size:.75rem; text-transform:uppercase; letter-spacing:.04em; color:light-dark(#64736a,#a9b8af); }
+td:last-child, th:last-child { text-align:right; }
+.empty { color:light-dark(#718078,#a9b8af); text-align:center; padding:18px; }
+footer { margin-top:16px; font-size:.78rem; color:light-dark(#64736a,#a9b8af); line-height:1.5; }
+@media(max-width:760px){ .layout{grid-template-columns:1fr;} .app{padding:14px 12px 28px;} header{padding:23px;} h1{font-size:calc(1.7rem * var(--site-heading-scale));} .card{padding:18px;} }
+@media(max-width:400px){.two{grid-template-columns:1fr;gap:0}.metrics{grid-template-columns:1fr 1fr}.metric{padding:12px}}
+</style>
+</head>
+<body>
+<main class="app">
+<div class="container">
+<header>
+  <div class="eyebrow">Retail • Sales Performance</div>
+  <h1>Kalkulator Target Sales Harian</h1>
+  <p>Hitung target penjualan per hari, pantau pencapaian, dan ketahui sisa target yang perlu dikejar tim toko.</p>
+</header>
+
+<div class="layout">
+<section class="card">
+<h2>Input Target & Penjualan</h2>
+<div class="field">
+<label for="date">Tanggal</label>
+<input id="date" type="date">
+</div>
+<div class="field">
+<label for="monthlyTarget">Target sales bulanan (Rp)</label>
+<input id="monthlyTarget" type="number" min="0" step="1000" value="300000000" inputmode="numeric">
+<div class="hint">Contoh: Rp300.000.000 untuk satu bulan.</div>
+</div>
+<div class="two">
+<div class="field">
+<label for="days">Hari operasional bulan ini</label>
+<input id="days" type="number" min="1" max="31" value="30">
+</div>
+<div class="field">
+<label for="elapsed">Hari operasional berlalu</label>
+<input id="elapsed" type="number" min="1" max="31" value="1">
+<div class="hint">Termasuk hari ini.</div>
+</div>
+</div>
+<div class="field">
+<label for="actual">Sales aktual hari ini (Rp)</label>
+<input id="actual" type="number" min="0" step="1000" value="7500000" inputmode="numeric">
+</div>
+<div class="field">
+<label for="mtd">Total sales bulan ini sampai hari ini (Rp)</label>
+<input id="mtd" type="number" min="0" step="1000" value="7500000" inputmode="numeric">
+<div class="hint">Isi total sales aktual dari awal bulan sampai hari ini.</div>
+</div>
+<div class="btnrow">
+<button class="primary" id="calculate">Hitung target</button>
+<button class="secondary" id="reset">Reset contoh</button>
+</div>
+</section>
+
+<section class="card" aria-live="polite">
+<h2>Ringkasan Pencapaian</h2>
+<div class="big">
+<div class="label">Target sales harian dasar</div>
+<div class="value" id="daily">Rp10.000.000</div>
+</div>
+<div class="metrics">
+<div class="metric"><div class="label">Pencapaian hari ini</div><div class="value" id="todayPct">75%</div></div>
+<div class="metric"><div class="label">Selisih hari ini</div><div class="value" id="todayGap">-Rp2.500.000</div></div>
+<div class="metric"><div class="label">Target kumulatif s.d. hari ini</div><div class="value" id="cumTarget">Rp10.000.000</div></div>
+<div class="metric"><div class="label">Pencapaian bulanan</div><div class="value" id="monthPct">2,5%</div></div>
+<div class="metric"><div class="label">Sisa target bulanan</div><div class="value" id="remaining">Rp292.500.000</div></div>
+<div class="metric"><div class="label">Target harian sisa hari</div><div class="value" id="needed">Rp10.086.207</div></div>
+</div>
+<div class="progress-wrap">
+<div class="progress-head"><span>Progress target bulanan</span><span id="progressLabel">2,5%</span></div>
+<div class="track"><div class="bar" id="progressBar"></div></div>
+<div class="status" id="status">Target harian belum tercapai. Evaluasi penjualan dan peluang transaksi.</div>
+</div>
+</section>
+</div>
+
+<section class="card" style="margin-top:18px">
+<h2>Rencana Target Harian Sisa Bulan</h2>
+<p class="hint" style="margin-top:-10px;margin-bottom:10px">Estimasi target rata-rata yang perlu dicapai setiap hari mulai besok agar target bulanan terpenuhi.</p>
+<div class="tablewrap">
+<table>
+<thead><tr><th>Keterangan</th><th>Nilai</th></tr></thead>
+<tbody>
+<tr><td>Target bulanan</td><td id="tMonthly">Rp300.000.000</td></tr>
+<tr><td>Sales aktual bulan berjalan</td><td id="tMtd">Rp7.500.000</td></tr>
+<tr><td>Target yang sudah seharusnya tercapai</td><td id="tExpected">Rp10.000.000</td></tr>
+<tr><td>Selisih terhadap target kumulatif</td><td id="tVariance">-Rp2.500.000</td></tr>
+<tr><td>Sisa hari operasional</td><td id="tDays">29 hari</td></tr>
+</tbody>
+</table>
+</div>
+<footer>Catatan: target harian dasar = target bulanan ÷ hari operasional. Target harian sisa hari = sisa target bulanan ÷ sisa hari operasional. Angka ini merupakan estimasi dan dapat disesuaikan dengan pola ramai/sepi toko.</footer>
+</section>
+</div>
+</main>
+<script>
+const $ = id => document.getElementById(id);
+const fields = ['date','monthlyTarget','days','elapsed','actual','mtd'];
+const rupiah = n => new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR',maximumFractionDigits:0}).format(Math.round(n));
+const pct = n => new Intl.NumberFormat('id-ID',{maximumFractionDigits:1}).format(n) + '%';
+function calculate(){
+  const target = Math.max(0, Number($('monthlyTarget').value)||0);
+  const days = Math.max(1, Math.min(31, Math.floor(Number($('days').value)||1)));
+  const elapsed = Math.max(1, Math.min(days, Math.floor(Number($('elapsed').value)||1)));
+  const actual = Math.max(0, Number($('actual').value)||0);
+  const mtd = Math.max(0, Number($('mtd').value)||0);
+  const daily = target/days;
+  const expected = target*elapsed/days;
+  const gap = actual-daily;
+  const variance = mtd-expected;
+  const remaining = Math.max(0,target-mtd);
+  const leftDays = Math.max(0,days-elapsed);
+  const needed = leftDays > 0 ? remaining/leftDays : remaining;
+  const todayPercent = daily > 0 ? actual/daily*100 : 0;
+  const monthPercent = target > 0 ? mtd/target*100 : 0;
+  $('daily').textContent=rupiah(daily);
+  $('todayPct').textContent=pct(todayPercent);
+  $('todayGap').textContent=(gap>0?'+':'')+rupiah(gap);
+  $('todayGap').style.color=gap>=0?'#18834b':'#c13b34';
+  $('cumTarget').textContent=rupiah(expected);
+  $('monthPct').textContent=pct(monthPercent);
+  $('remaining').textContent=rupiah(remaining);
+  $('needed').textContent=rupiah(needed);
+  $('progressLabel').textContent=pct(Math.min(100,monthPercent));
+  $('progressBar').style.width=Math.min(100,Math.max(0,monthPercent))+'%';
+  $('tMonthly').textContent=rupiah(target);
+  $('tMtd').textContent=rupiah(mtd);
+  $('tExpected').textContent=rupiah(expected);
+  $('tVariance').textContent=(variance>0?'+':'')+rupiah(variance);
+  $('tVariance').style.color=variance>=0?'#18834b':'#c13b34';
+  $('tDays').textContent=leftDays+' hari';
+  const status=$('status');
+  status.className='status';
+  if(target===0){status.textContent='Masukkan target bulanan lebih dari Rp0 untuk memulai perhitungan.';}
+  else if(elapsed===days && mtd>=target){status.classList.add('good');status.textContent='Target bulanan tercapai! Pertahankan performa penjualan.';}
+  else if(elapsed===days){status.classList.add(mtd>=target?'good':'warn');status.textContent=mtd>=target?'Target bulanan tercapai!':'Hari operasional terakhir. Kekurangan target: '+rupiah(remaining)+'.';}
+  else if(variance>=0 && gap>=0){status.classList.add('good');status.textContent='Bagus! Sales hari ini dan pencapaian kumulatif sudah sesuai atau di atas target.';}
+  else if(variance<0){status.classList.add('warn');status.textContent='Pencapaian kumulatif masih tertinggal '+rupiah(Math.abs(variance))+'. Target rata-rata mulai besok: '+rupiah(needed)+' per hari.';}
+  else {status.classList.add('warn');status.textContent='Target hari ini belum tercapai. Selisih '+rupiah(Math.abs(gap))+'. Pantau peluang transaksi dan sales per departemen.';}
+}
+$('calculate').addEventListener('click',calculate);
+fields.forEach(id=>$(id).addEventListener('input',calculate));
+$('reset').addEventListener('click',()=>{
+  $('date').value=new Date().toLocaleDateString('en-CA');
+  $('monthlyTarget').value=300000000;$('days').value=30;$('elapsed').value=1;$('actual').value=7500000;$('mtd').value=7500000;calculate();
+});
+const now=new Date();
+$('date').value=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
+$('days').value=new Date(now.getFullYear(),now.getMonth()+1,0).getDate();
+$('elapsed').value=now.getDate();
+calculate();
+</script>
+</body>
+</html>
